@@ -44,7 +44,7 @@ if [[ $(python test-crates/pyo3-pure/check_installed/check_installed.py) != 'SUC
   exit 1
 fi
 
-docker run --rm -v $(pwd)/test-crates/pyo3-mixed:/io maturin build --no-sdist -i python3.6
+docker run --rm -v $(pwd)/test-crates/pyo3-mixed:/io maturin build --no-sdist -i python3.6 --py-src python
 
 pip install pyo3-mixed --no-index --find-links test-crates/pyo3-mixed/target/wheels/
 

@@ -55,6 +55,9 @@ pub struct BuildOptions {
     /// directory in the project's target directory
     #[structopt(short, long, parse(from_os_str))]
     pub out: Option<PathBuf>,
+    /// Path to the Python source in mixed projects.
+    #[structopt(long = "py-src", parse(from_os_str))]
+    pub py_src: Option<PathBuf>,
     /// [deprecated, use --manylinux instead] Don't check for manylinux compliance
     #[structopt(long = "skip-auditwheel")]
     pub skip_auditwheel: bool,
@@ -80,6 +83,7 @@ impl Default for BuildOptions {
             interpreter: Some(vec![]),
             bindings: None,
             manifest_path: PathBuf::from("Cargo.toml"),
+            py_src: None,
             out: None,
             skip_auditwheel: false,
             target: None,
@@ -120,7 +124,7 @@ impl BuildOptions {
             .unwrap_or_else(|| &cargo_toml.package.name)
             .to_owned();
 
-        let project_layout = ProjectLayout::determine(manifest_dir, &module_name)?;
+        let project_layout = ProjectLayout::determine(manifest_dir, &module_name, self.py_src)?;
 
         let target = Target::from_target_triple(self.target.clone())?;
 

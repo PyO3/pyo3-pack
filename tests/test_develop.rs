@@ -10,32 +10,40 @@ mod common;
 
 #[test]
 fn test_develop_pyo3_pure() {
-    handle_result(test_develop("test-crates/pyo3-pure", None));
+    handle_result(test_develop("test-crates/pyo3-pure", None, None));
 }
 
 #[test]
 fn test_develop_pyo3_mixed() {
-    handle_result(test_develop("test-crates/pyo3-mixed", None));
+    handle_result(test_develop(
+        "test-crates/pyo3-mixed",
+        None,
+        Some("python".into()),
+    ));
 }
 
 #[test]
 fn test_develop_cffi_pure() {
-    handle_result(test_develop("test-crates/cffi-pure", None));
+    handle_result(test_develop("test-crates/cffi-pure", None, None));
 }
 
 #[test]
 fn test_develop_cffi_mixed() {
-    handle_result(test_develop("test-crates/cffi-mixed", None));
+    handle_result(test_develop("test-crates/cffi-mixed", None, None));
 }
 
 #[test]
 fn test_develop_hello_world() {
-    handle_result(test_develop("test-crates/hello-world", None));
+    handle_result(test_develop("test-crates/hello-world", None, None));
 }
 
 /// Creates a virtualenv and activates it, checks that the package isn't installed, uses
 /// "maturin develop" to install it and checks it is working
-fn test_develop(package: impl AsRef<Path>, bindings: Option<String>) -> Result<()> {
+fn test_develop(
+    package: impl AsRef<Path>,
+    bindings: Option<String>,
+    py_src: Option<PathBuf>,
+) -> Result<()> {
     maybe_mock_cargo();
 
     let test_name = package
@@ -96,6 +104,7 @@ fn test_develop(package: impl AsRef<Path>, bindings: Option<String>) -> Result<(
         &venv_dir,
         false,
         cfg!(feature = "faster-tests"),
+        py_src.map(|src| src.into()),
     )?;
 
     check_installed(&package.as_ref(), &python)?;

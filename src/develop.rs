@@ -7,11 +7,12 @@ use crate::PythonInterpreter;
 use crate::Target;
 use anyhow::{anyhow, format_err, Context, Result};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /// Installs a crate by compiling it and copying the shared library to the right directory
 ///
 /// Works only in a virtualenv.
+#[allow(clippy::too_many_arguments)]
 pub fn develop(
     bindings: Option<String>,
     manifest_file: &Path,
@@ -20,6 +21,7 @@ pub fn develop(
     venv_dir: &Path,
     release: bool,
     strip: bool,
+    py_src: Option<PathBuf>,
 ) -> Result<()> {
     let target = Target::from_target_triple(None)?;
 
@@ -32,6 +34,7 @@ pub fn develop(
         manifest_path: manifest_file.to_path_buf(),
         out: None,
         skip_auditwheel: false,
+        py_src,
         target: None,
         cargo_extra_args,
         rustc_extra_args,

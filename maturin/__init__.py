@@ -30,6 +30,7 @@ available_options = [
     "rustc-extra-args",
     "skip-auditwheel",
     "strip",
+    "py-src"
 ]
 
 

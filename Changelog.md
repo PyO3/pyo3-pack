@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `[tool.maturin]` now supports `sdist-include = ["path/**/*"]` to
 include arbitrary files in source distributions ([#296](https://github.com/PyO3/maturin/pull/296)).
  * Add support for PyO3 `0.12`'s `PYO3_PYTHON` environment variable. [#331](https://github.com/PyO3/maturin/pull/331)
+* Enable mixed layouts with Python source in different sub-directories. Either through `tools.maturin.py-src`
+  in `pyproject.toml` or through the `--py-src` flag on `maturin`. 
+  ([#335](https://github.com/PyO3/maturin/pull/335))
 
 ### Fixed
 

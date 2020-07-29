@@ -59,8 +59,19 @@ pub enum ProjectLayout {
 
 impl ProjectLayout {
     /// Checks whether a python module exists besides Cargo.toml with the right name
-    pub fn determine(project_root: impl AsRef<Path>, module_name: &str) -> Result<ProjectLayout> {
-        let python_package_dir = project_root.as_ref().join(module_name);
+    pub fn determine(
+        project_root: impl AsRef<Path>,
+        module_name: &str,
+        py_src: Option<impl AsRef<Path>>,
+    ) -> Result<ProjectLayout> {
+        let python_package_dir = if let Some(py_src) = py_src {
+            project_root
+                .as_ref()
+                .join(py_src.as_ref())
+                .join(module_name)
+        } else {
+            project_root.as_ref().join(module_name)
+        };
         if python_package_dir.is_dir() {
             if !python_package_dir.join("__init__.py").is_file() {
                 bail!("Found a directory with the module name ({}) next to Cargo.toml, which indicates a mixed python/rust project, but the directory didn't contain an __init__.py file.", module_name)

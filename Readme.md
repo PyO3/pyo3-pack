@@ -91,6 +91,8 @@ my-project
     └── lib.rs
 ```
 
+You can also specify the directory housing the package through the `--py-src` argument. 
+
 maturin will add the native extension as a module in your python folder. When using develop, maturin will copy the native library and for cffi also the glue code to your python folder. You should add those files to your gitignore.
 
 With cffi you can do `from .my_project import lib` and then use `lib.my_native_function`, with pyo3/rust-cpython you can directly `from .my_project import my_native_function`.

@@ -13,39 +13,47 @@ mod common;
 
 #[test]
 fn test_integration_pyo3_pure() {
-    handle_result(test_integration("test-crates/pyo3-pure", None));
+    handle_result(test_integration("test-crates/pyo3-pure", None, None));
 }
 
 #[test]
 fn test_integration_pyo3_mixed() {
-    handle_result(test_integration("test-crates/pyo3-mixed", None));
+    handle_result(test_integration(
+        "test-crates/pyo3-mixed",
+        None,
+        Some("python".into()),
+    ));
 }
 
 #[cfg(target_os = "windows")]
 #[test]
 #[ignore]
 fn test_integration_pyo3_pure_conda() {
-    handle_result(test_integration_conda("text-crates/pyo3-pure", None));
+    handle_result(test_integration_conda("text-crates/pyo3-pure", None, None));
 }
 
 #[test]
 fn test_integration_cffi_pure() {
-    handle_result(test_integration("test-crates/cffi-pure", None));
+    handle_result(test_integration("test-crates/cffi-pure", None, None));
 }
 
 #[test]
 fn test_integration_cffi_mixed() {
-    handle_result(test_integration("test-crates/cffi-mixed", None));
+    handle_result(test_integration("test-crates/cffi-mixed", None, None));
 }
 
 #[test]
 fn test_integration_hello_world() {
-    handle_result(test_integration("test-crates/hello-world", None));
+    handle_result(test_integration("test-crates/hello-world", None, None));
 }
 
 /// For each installed python version, this builds a wheel, creates a virtualenv if it
 /// doesn't exist, installs the package and runs check_installed.py
-fn test_integration(package: impl AsRef<Path>, bindings: Option<String>) -> Result<()> {
+fn test_integration(
+    package: impl AsRef<Path>,
+    bindings: Option<String>,
+    py_src: Option<String>,
+) -> Result<()> {
     maybe_mock_cargo();
 
     let target = Target::from_target_triple(None)?;
@@ -63,6 +71,11 @@ fn test_integration(package: impl AsRef<Path>, bindings: Option<String>) -> Resu
     if let Some(ref bindings) = bindings {
         cli.push("--bindings");
         cli.push(bindings);
+    }
+
+    if let Some(py_src) = py_src.as_ref() {
+        cli.push("--py-src");
+        cli.push(py_src);
     }
 
     let options = BuildOptions::from_iter_safe(cli)?;
@@ -153,7 +166,11 @@ fn create_conda_env(name: &str, major: usize, minor: usize) {
 }
 
 #[cfg(target_os = "windows")]
-fn test_integration_conda(package: impl AsRef<Path>, bindings: Option<String>) -> Result<()> {
+fn test_integration_conda(
+    package: impl AsRef<Path>,
+    bindings: Option<String>,
+    py_src: Option<String>,
+) -> Result<()> {
     use std::env;
 
     let package_string = package.as_ref().join("Cargo.toml").display().to_string();
@@ -186,6 +203,11 @@ fn test_integration_conda(package: impl AsRef<Path>, bindings: Option<String>) -
     if let Some(ref bindings) = bindings {
         cli.push("--bindings");
         cli.push(bindings);
+    }
+
+    if let Some(py_src) = py_src.as_ref() {
+        cli.push("--py-src");
+        cli.push(py_src);
     }
 
     let options = BuildOptions::from_iter_safe(cli)?;

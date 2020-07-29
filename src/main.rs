@@ -175,6 +175,9 @@ enum Opt {
         /// Use as `--rustc-extra-args="--my-arg"`
         #[structopt(long = "rustc-extra-args")]
         rustc_extra_args: Vec<String>,
+        /// Path to the Python source in mixed projects.
+        #[structopt(long = "py-src", parse(from_os_str))]
+        py_src: Option<PathBuf>,
     },
     /// Build only a source distribution (sdist) without compiling.
     ///
@@ -441,6 +444,7 @@ fn run() -> Result<()> {
             rustc_extra_args,
             release,
             strip,
+            py_src,
         } => {
             let venv_dir = match (env::var_os("VIRTUAL_ENV"),env::var_os("CONDA_PREFIX")) {
                 (Some(dir), None) => PathBuf::from(dir),
@@ -459,6 +463,7 @@ fn run() -> Result<()> {
                 &venv_dir,
                 release,
                 strip,
+                py_src,
             )?;
         }
         Opt::SDist { manifest_path, out } => {
