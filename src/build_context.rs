@@ -65,15 +65,30 @@ pub enum ProjectLayout {
 impl ProjectLayout {
     /// Checks whether a python module exists besides Cargo.toml with the right name
     pub fn determine(project_root: impl AsRef<Path>, module_name: &str) -> Result<ProjectLayout> {
-        let python_package_dir = project_root.as_ref().join(module_name);
-        if python_package_dir.is_dir() {
-            if !python_package_dir.join("__init__.py").is_file() {
-                bail!("Found a directory with the module name ({}) next to Cargo.toml, which indicates a mixed python/rust project, but the directory didn't contain an __init__.py file.", module_name)
+        let python_dir_root = project_root.as_ref().join(module_name);
+        let python_dir_python = project_root.as_ref().join("python_src").join(module_name);
+        let python_dir;
+        if python_dir_root.is_dir() {
+            python_dir = Some(python_dir_root);
+        } else if python_dir_python.is_dir() {
+            python_dir = Some(python_dir_python);
+        } else {
+            python_dir = None;
+        }
+
+        if let Some(python_dir) = python_dir {
+            if !python_dir.join("__init__.py").is_file() {
+                bail!(
+                    "Found a directory with the module name ({}) next to Cargo.toml, \
+                    which indicates a mixed python/rust project, \
+                    but the directory didn't contain an __init__.py file.",
+                    module_name
+                )
             }
 
             println!("🍹 Building a mixed python/rust project");
 
-            Ok(ProjectLayout::Mixed(python_package_dir))
+            Ok(ProjectLayout::Mixed(python_dir))
         } else {
             Ok(ProjectLayout::PureRust)
         }

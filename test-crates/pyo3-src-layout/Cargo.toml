@@ -1,0 +1,23 @@
+[package]
+authors = ["konstin <konstin@mailbox.org>"]
+name = "pyo3-src-layout"
+version = "2.1.3"
+description = "Implements a dummy function combining rust and python using the python_src layout"
+readme = "Readme.md"
+edition = "2018"
+
+[package.metadata.maturin.scripts]
+get_42 = "pyo3_mixed:get_42"
+
+[package.metadata.maturin]
+classifier = [
+    "Programming Language :: Python",
+    "Programming Language :: Rust"
+]
+
+[dependencies]
+pyo3 = { version = "0.13.2", features = ["extension-module"] }
+
+[lib]
+name = "pyo3_src_layout"
+crate-type = ["cdylib"]

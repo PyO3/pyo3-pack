@@ -83,11 +83,25 @@ To create a mixed rust/python project, create a folder with your module name (i.
 my-project
 ├── Cargo.toml
 ├── my_project
-│   ├── __init__.py
-│   └── bar.py
+│   ├── __init__.py
+│   └── bar.py
 ├── Readme.md
 └── src
-    └── lib.rs
+    └── lib.rs
+```
+
+Alternatively, you can also put the python sources in a folder called `python_src`, which resembles the [src layout](https://hynek.me/articles/testing-packaging/#src) without conflicting with rust's `src` directory:
+
+```
+my-project
+├── Cargo.toml
+├── python_src
+│   └── my_project
+│       ├── __init__.py
+│       └── bar.py
+├── Readme.md
+└── src
+    └── lib.rs
 ```
 
 maturin will add the native extension as a module in your python folder. When using develop, maturin will copy the native library and for cffi also the glue code to your python folder. You should add those files to your gitignore.
