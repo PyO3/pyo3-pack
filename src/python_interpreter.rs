@@ -412,10 +412,15 @@ impl PythonInterpreter {
         target: &Target,
         bridge: &BridgeModel,
     ) -> Result<Option<PythonInterpreter>> {
-        let output = Command::new(&executable.as_ref())
-            .args(&["-c", GET_INTERPRETER_METADATA])
-            .stderr(Stdio::inherit())
-            .output();
+        let output = match which::which(&executable.as_ref()) {
+            Ok(path) => Command::new(path)
+                .args(&["-c", GET_INTERPRETER_METADATA])
+                .stderr(Stdio::inherit())
+                .output(),
+            Err(_err) => {
+                return Ok(None);
+            }
+        };
 
         let err_msg = format!(
             "Trying to get metadata from the python interpreter '{}' failed",
