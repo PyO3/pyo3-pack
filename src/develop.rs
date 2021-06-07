@@ -48,11 +48,11 @@ pub fn develop(
         })?;
 
     // Install dependencies
-    if !build_context.metadata21.requires_dist.is_empty() {
+    if !build_context.metadata22.requires_dist.is_empty() {
         let mut args = vec!["-m", "pip", "install"];
         args.extend(
             build_context
-                .metadata21
+                .metadata22
                 .requires_dist
                 .iter()
                 .map(|x| x.as_str()),
@@ -74,7 +74,7 @@ pub fn develop(
     //
     // Uninstalling the actual code is done individually for each bridge model
     let base_path = target.get_venv_site_package(venv_dir, &interpreter);
-    let dist_info_dir = base_path.join(build_context.metadata21.get_dist_info_dir());
+    let dist_info_dir = base_path.join(build_context.metadata22.get_dist_info_dir());
     if dist_info_dir.is_dir() {
         fs::remove_dir_all(&dist_info_dir).context(format!(
             "Failed to uninstall existing installation by removing {}",
@@ -178,18 +178,18 @@ pub fn develop(
         }
     };
 
-    write_dist_info(&mut writer, &build_context.metadata21, &tags)?;
+    write_dist_info(&mut writer, &build_context.metadata22, &tags)?;
 
     // https://packaging.python.org/specifications/recording-installed-packages/#the-installer-file
     writer.add_bytes(
         build_context
-            .metadata21
+            .metadata22
             .get_dist_info_dir()
             .join("INSTALLER"),
         env!("CARGO_PKG_NAME").as_bytes(),
     )?;
 
-    writer.write_record(&build_context.metadata21)?;
+    writer.write_record(&build_context.metadata22)?;
 
     Ok(())
 }

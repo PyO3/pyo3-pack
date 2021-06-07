@@ -1,5 +1,5 @@
 use crate::module_writer::ModuleWriter;
-use crate::{Metadata21, SDistWriter};
+use crate::{Metadata22, SDistWriter};
 use anyhow::{bail, Context, Result};
 use cargo_metadata::Metadata;
 use fs_err as fs;
@@ -164,7 +164,7 @@ fn add_crate_to_source_distribution(
 /// https://packaging.python.org/specifications/source-distribution-format/#source-distribution-file-format
 pub fn source_distribution(
     wheel_dir: impl AsRef<Path>,
-    metadata21: &Metadata21,
+    metadata22: &Metadata22,
     manifest_path: impl AsRef<Path>,
     cargo_metadata: &Metadata,
     sdist_include: Option<&Vec<String>>,
@@ -185,11 +185,11 @@ pub fn source_distribution(
         .map(|captures| (captures[1].to_string(), captures[2].to_string()))
         .collect();
 
-    let mut writer = SDistWriter::new(wheel_dir, &metadata21)?;
+    let mut writer = SDistWriter::new(wheel_dir, &metadata22)?;
     let root_dir = PathBuf::from(format!(
         "{}-{}",
-        &metadata21.get_distribution_escaped(),
-        &metadata21.get_version_escaped()
+        &metadata22.get_distribution_escaped(),
+        &metadata22.get_version_escaped()
     ));
 
     // Add local path dependencies
@@ -233,7 +233,7 @@ pub fn source_distribution(
 
     writer.add_bytes(
         root_dir.join("PKG-INFO"),
-        metadata21.to_file_contents().as_bytes(),
+        metadata22.to_file_contents().as_bytes(),
     )?;
 
     let source_distribution_path = writer.finish()?;

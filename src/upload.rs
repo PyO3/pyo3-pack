@@ -50,7 +50,7 @@ impl From<reqwest::Error> for UploadError {
 pub fn upload(
     registry: &Registry,
     wheel_path: &Path,
-    metadata21: &[(String, String)],
+    metadata22: &[(String, String)],
     supported_version: &str,
 ) -> Result<(), UploadError> {
     let mut wheel = File::open(&wheel_path)?;
@@ -75,7 +75,7 @@ pub fn upload(
     let joined_metadata: Vec<(String, String)> = api_metadata
         .into_iter()
         // Type system shenanigans
-        .chain(metadata21.to_vec().into_iter())
+        .chain(metadata22.to_vec().into_iter())
         // All fields must be lower case and with underscores or they will be ignored by warehouse
         .map(|(key, value)| {
             let mut key = key.to_lowercase().replace("-", "_");

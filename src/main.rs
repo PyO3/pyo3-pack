@@ -16,7 +16,7 @@ use human_panic::setup_panic;
 use keyring::{Keyring, KeyringError};
 use maturin::{
     develop, source_distribution, write_dist_info, BridgeModel, BuildOptions, CargoToml,
-    Metadata21, PathWriter, PlatformTag, PyProjectToml, PythonInterpreter, Target,
+    Metadata22, PathWriter, PlatformTag, PyProjectToml, PythonInterpreter, Target,
 };
 use std::env;
 use std::path::PathBuf;
@@ -410,8 +410,8 @@ fn pep517(subcommand: Pep517Command) -> Result<()> {
             };
 
             let mut writer = PathWriter::from_path(metadata_directory);
-            write_dist_info(&mut writer, &context.metadata21, &tags)?;
-            println!("{}", context.metadata21.get_dist_info_dir().display());
+            write_dist_info(&mut writer, &context.metadata22, &tags)?;
+            println!("{}", context.metadata22.get_dist_info_dir().display());
         }
         Pep517Command::BuildWheel {
             build_options,
@@ -428,7 +428,7 @@ fn pep517(subcommand: Pep517Command) -> Result<()> {
         } => {
             let cargo_toml = CargoToml::from_path(&manifest_path)?;
             let manifest_dir = manifest_path.parent().unwrap();
-            let metadata21 = Metadata21::from_cargo_toml(&cargo_toml, &manifest_dir)
+            let metadata22 = Metadata22::from_cargo_toml(&cargo_toml, &manifest_dir)
                 .context("Failed to parse Cargo.toml into python metadata")?;
             let cargo_metadata = MetadataCommand::new()
                 .manifest_path(&manifest_path)
@@ -437,7 +437,7 @@ fn pep517(subcommand: Pep517Command) -> Result<()> {
 
             let path = source_distribution(
                 sdist_directory,
-                &metadata21,
+                &metadata22,
                 &manifest_path,
                 &cargo_metadata,
                 None,
@@ -559,7 +559,7 @@ fn run() -> Result<()> {
                 eprintln!("⚠  Warning: You're publishing debug wheels");
             }
 
-            let metadata21 = build_context.metadata21.to_vec();
+            let metadata22 = build_context.metadata22.to_vec();
             let mut wheels = build_context.build_wheels()?;
             if !no_sdist {
                 if let Some(sd) = build_context.build_source_distribution()? {
@@ -569,7 +569,7 @@ fn run() -> Result<()> {
 
             let items = wheels
                 .into_iter()
-                .map(|wheel| UploadItem::from_built_wheel(wheel, metadata21.clone()))
+                .map(|wheel| UploadItem::from_built_wheel(wheel, metadata22.clone()))
                 .collect::<Vec<_>>();
 
             upload_ui(&items, &publish)?
@@ -625,7 +625,7 @@ fn run() -> Result<()> {
                 .context("A pyproject.toml with a PEP 517 compliant `[build-system]` table is required to build a source distribution")?;
 
             let cargo_toml = CargoToml::from_path(&manifest_path)?;
-            let metadata21 = Metadata21::from_cargo_toml(&cargo_toml, &manifest_dir)
+            let metadata22 = Metadata22::from_cargo_toml(&cargo_toml, &manifest_dir)
                 .context("Failed to parse Cargo.toml into python metadata")?;
 
             let cargo_metadata = MetadataCommand::new()
@@ -643,7 +643,7 @@ fn run() -> Result<()> {
 
             source_distribution(
                 &wheel_dir,
-                &metadata21,
+                &metadata22,
                 &manifest_path,
                 &cargo_metadata,
                 pyproject.sdist_include(),

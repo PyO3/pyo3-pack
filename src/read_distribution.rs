@@ -200,7 +200,7 @@ mod test {
         let metadata =
             get_metadata_for_distribution(Path::new("test-data/pyo3_mixed-2.1.1.tar.gz")).unwrap();
         let expected: Vec<_> = [
-            ("Metadata-Version", "2.1"),
+            ("Metadata-Version", "2.2"),
             ("Name", "pyo3-mixed"),
             ("Version", "2.1.1"),
             ("Summary", "Implements a dummy function combining rust and python"),

@@ -10,22 +10,22 @@ use std::str;
 /// The metadata required to generate the .dist-info directory
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
 pub struct WheelMetadata {
-    /// Python Package Metadata 2.1
-    pub metadata21: Metadata21,
+    /// Python Package Metadata 2.2
+    pub metadata22: Metadata22,
     /// The `[console_scripts]` for the entry_points.txt
     pub scripts: HashMap<String, String>,
     /// The name of the module can be distinct from the package name, mostly
     /// because package names normally contain minuses while module names
-    /// have underscores. The package name is part of metadata21
+    /// have underscores. The package name is part of metadata22
     pub module_name: String,
 }
 
-/// Python Package Metadata 2.1 as specified in
+/// Python Package Metadata 2.2 as specified in
 /// https://packaging.python.org/specifications/core-metadata/
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 #[allow(missing_docs)]
-pub struct Metadata21 {
+pub struct Metadata22 {
     // Mandatory fields
     pub metadata_version: String,
     pub name: String,
@@ -78,7 +78,7 @@ fn path_to_content_type(path: &Path) -> String {
         })
 }
 
-impl Metadata21 {
+impl Metadata22 {
     /// Merge metadata with pyproject.toml, where pyproject.toml takes precedence
     ///
     /// manifest_path must be the directory, not the file
@@ -248,14 +248,13 @@ impl Metadata21 {
         }
         Ok(())
     }
-
     /// Uses a Cargo.toml to create the metadata for python packages
     ///
     /// manifest_path must be the directory, not the file
     pub fn from_cargo_toml(
         cargo_toml: &CargoToml,
         manifest_path: impl AsRef<Path>,
-    ) -> Result<Metadata21> {
+    ) -> Result<Metadata22> {
         let authors = cargo_toml.package.authors.join(", ");
 
         let classifiers = cargo_toml.classifiers();
@@ -296,8 +295,8 @@ impl Metadata21 {
             })
             .unwrap_or_else(|| cargo_toml.package.name.clone());
 
-        let mut metadata = Metadata21 {
-            metadata_version: "2.1".to_owned(),
+        let mut metadata = Metadata22 {
+            metadata_version: "2.2".to_owned(),
 
             // Mapped from cargo metadata
             name,
@@ -475,7 +474,7 @@ mod test {
         let cargo_toml_struct: CargoToml = toml::from_str(&toml_with_path).unwrap();
 
         let metadata =
-            Metadata21::from_cargo_toml(&cargo_toml_struct, &readme_md.path().parent().unwrap())
+            Metadata22::from_cargo_toml(&cargo_toml_struct, &readme_md.path().parent().unwrap())
                 .unwrap();
 
         let actual = metadata.to_file_contents();
@@ -538,7 +537,7 @@ mod test {
 
         let expected = indoc!(
             r#"
-            Metadata-Version: 2.1
+            Metadata-Version: 2.2
             Name: info-project
             Version: 0.1.0
             Classifier: Programming Language :: Python
@@ -597,7 +596,7 @@ mod test {
 
         let expected = indoc!(
             r#"
-            Metadata-Version: 2.1
+            Metadata-Version: 2.2
             Name: info-project
             Version: 0.1.0
             Classifier: Programming Language :: Python
@@ -645,7 +644,7 @@ mod test {
 
         let expected = indoc!(
             r#"
-            Metadata-Version: 2.1
+            Metadata-Version: 2.2
             Name: info
             Version: 0.1.0
             Classifier: Programming Language :: Python
@@ -658,7 +657,7 @@ mod test {
 
         let cargo_toml_struct: CargoToml = toml::from_str(&cargo_toml).unwrap();
         let metadata =
-            Metadata21::from_cargo_toml(&cargo_toml_struct, "/not/exist/manifest/path").unwrap();
+            Metadata22::from_cargo_toml(&cargo_toml_struct, "/not/exist/manifest/path").unwrap();
         let actual = metadata.to_file_contents();
 
         assert_eq!(
@@ -702,7 +701,7 @@ mod test {
     fn test_merge_metadata_from_pyproject_toml() {
         let cargo_toml_str = fs_err::read_to_string("test-crates/pyo3-pure/Cargo.toml").unwrap();
         let cargo_toml: CargoToml = toml::from_str(&cargo_toml_str).unwrap();
-        let metadata = Metadata21::from_cargo_toml(&cargo_toml, "test-crates/pyo3-pure").unwrap();
+        let metadata = Metadata22::from_cargo_toml(&cargo_toml, "test-crates/pyo3-pure").unwrap();
         assert_eq!(
             metadata.summary,
             Some("Implements a dummy function in Rust".to_string())

@@ -3,7 +3,7 @@
 use crate::build_context::ProjectLayout;
 use crate::PythonInterpreter;
 use crate::Target;
-use crate::{BridgeModel, Metadata21};
+use crate::{BridgeModel, Metadata22};
 use anyhow::{anyhow, bail, Context, Result};
 use flate2::write::GzEncoder;
 use flate2::Compression;
@@ -122,10 +122,10 @@ impl PathWriter {
     }
 
     /// Writes the RECORD file after everything else has been written
-    pub fn write_record(self, metadata21: &Metadata21) -> Result<()> {
+    pub fn write_record(self, metadata22: &Metadata22) -> Result<()> {
         let record_file = self
             .base_path
-            .join(metadata21.get_dist_info_dir())
+            .join(metadata22.get_dist_info_dir())
             .join("RECORD");
         let mut buffer = File::create(&record_file).context(format!(
             "Failed to create a file at {}",
@@ -247,13 +247,13 @@ impl WheelWriter {
     pub fn new(
         tag: &str,
         wheel_dir: &Path,
-        metadata21: &Metadata21,
+        metadata22: &Metadata22,
         tags: &[String],
     ) -> Result<WheelWriter> {
         let wheel_path = wheel_dir.join(format!(
             "{}-{}-{}.whl",
-            metadata21.get_distribution_escaped(),
-            metadata21.get_version_escaped(),
+            metadata22.get_distribution_escaped(),
+            metadata22.get_version_escaped(),
             tag
         ));
 
@@ -262,11 +262,11 @@ impl WheelWriter {
         let mut builder = WheelWriter {
             zip: ZipWriter::new(file),
             record: Vec::new(),
-            record_file: metadata21.get_dist_info_dir().join("RECORD"),
+            record_file: metadata22.get_dist_info_dir().join("RECORD"),
             wheel_path,
         };
 
-        write_dist_info(&mut builder, &metadata21, &tags)?;
+        write_dist_info(&mut builder, &metadata22, &tags)?;
 
         Ok(builder)
     }
@@ -339,11 +339,11 @@ impl ModuleWriter for SDistWriter {
 
 impl SDistWriter {
     /// Create a source distribution .tar.gz which can be subsequently expanded
-    pub fn new(wheel_dir: impl AsRef<Path>, metadata21: &Metadata21) -> Result<Self, io::Error> {
+    pub fn new(wheel_dir: impl AsRef<Path>, metadata22: &Metadata22) -> Result<Self, io::Error> {
         let path = wheel_dir.as_ref().join(format!(
             "{}-{}.tar.gz",
-            &metadata21.get_distribution_escaped(),
-            &metadata21.get_version_escaped()
+            &metadata22.get_distribution_escaped(),
+            &metadata22.get_version_escaped()
         ));
 
         let tar_gz = File::create(&path)?;
@@ -679,7 +679,7 @@ pub fn write_cffi_module(
 pub fn write_bin(
     writer: &mut impl ModuleWriter,
     artifact: &Path,
-    metadata: &Metadata21,
+    metadata: &Metadata22,
     bin_name: &OsStr,
 ) -> Result<()> {
     let data_dir = PathBuf::from(format!(
@@ -734,28 +734,28 @@ pub fn write_python_part(
 /// Creates the .dist-info directory and fills it with all metadata files except RECORD
 pub fn write_dist_info(
     writer: &mut impl ModuleWriter,
-    metadata21: &Metadata21,
+    metadata22: &Metadata22,
     tags: &[String],
 ) -> Result<()> {
-    let dist_info_dir = metadata21.get_dist_info_dir();
+    let dist_info_dir = metadata22.get_dist_info_dir();
 
     writer.add_directory(&dist_info_dir)?;
 
     writer.add_bytes(
         &dist_info_dir.join("METADATA"),
-        metadata21.to_file_contents().as_bytes(),
+        metadata22.to_file_contents().as_bytes(),
     )?;
 
     writer.add_bytes(&dist_info_dir.join("WHEEL"), wheel_file(tags).as_bytes())?;
 
     let mut entry_points = String::new();
-    if !metadata21.scripts.is_empty() {
-        entry_points.push_str(&entry_points_txt("console_scripts", &metadata21.scripts));
+    if !metadata22.scripts.is_empty() {
+        entry_points.push_str(&entry_points_txt("console_scripts", &metadata22.scripts));
     }
-    if !metadata21.gui_scripts.is_empty() {
-        entry_points.push_str(&entry_points_txt("gui_scripts", &metadata21.gui_scripts));
+    if !metadata22.gui_scripts.is_empty() {
+        entry_points.push_str(&entry_points_txt("gui_scripts", &metadata22.gui_scripts));
     }
-    for (entry_type, scripts) in &metadata21.entry_points {
+    for (entry_type, scripts) in &metadata22.entry_points {
         entry_points.push_str(&entry_points_txt(entry_type, scripts));
     }
     if !entry_points.is_empty() {

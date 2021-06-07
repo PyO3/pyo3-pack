@@ -4,7 +4,7 @@ use crate::cross_compile::{find_sysconfigdata, is_cross_compiling, parse_sysconf
 use crate::python_interpreter::InterpreterKind;
 use crate::BuildContext;
 use crate::CargoToml;
-use crate::Metadata21;
+use crate::Metadata22;
 use crate::PythonInterpreter;
 use crate::Target;
 use anyhow::{bail, format_err, Context, Result};
@@ -130,7 +130,7 @@ impl BuildOptions {
 
         let cargo_toml = CargoToml::from_path(&manifest_file)?;
         let manifest_dir = manifest_file.parent().unwrap();
-        let metadata21 = Metadata21::from_cargo_toml(&cargo_toml, &manifest_dir)
+        let metadata22 = Metadata22::from_cargo_toml(&cargo_toml, &manifest_dir)
             .context("Failed to parse Cargo.toml into python metadata")?;
         let extra_metadata = cargo_toml.remaining_core_metadata();
 
@@ -201,7 +201,7 @@ impl BuildOptions {
             // User given list of interpreters
             Some(interpreter) => find_interpreter(&bridge, &interpreter, &target, None)?,
             // Auto-detect interpreters
-            None => find_interpreter(&bridge, &[], &target, get_min_python_minor(&metadata21))?,
+            None => find_interpreter(&bridge, &[], &target, get_min_python_minor(&metadata22))?,
         };
 
         let rustc_extra_args = split_extra_args(&self.rustc_extra_args)?;
@@ -229,7 +229,7 @@ impl BuildOptions {
             target,
             bridge,
             project_layout,
-            metadata21,
+            metadata22,
             crate_name: crate_name.to_string(),
             module_name,
             manifest_path: self.manifest_path,
@@ -249,8 +249,8 @@ impl BuildOptions {
 
 /// Uses very simple PEP 440 subset parsing to determine the
 /// minimum supported python minor version for interpreter search
-fn get_min_python_minor(metadata21: &Metadata21) -> Option<usize> {
-    if let Some(requires_python) = &metadata21.requires_python {
+fn get_min_python_minor(metadata22: &Metadata22) -> Option<usize> {
+    if let Some(requires_python) = &metadata22.requires_python {
         let regex = Regex::new(r#">=3\.(\d+)(?:\.\d)?"#).unwrap();
         if let Some(captures) = regex.captures(&requires_python) {
             let min_python_minor = captures[1]
@@ -760,8 +760,8 @@ mod test {
     fn test_get_min_python_minor() {
         // Nothing specified
         let cargo_toml = CargoToml::from_path("test-crates/pyo3-pure/Cargo.toml").unwrap();
-        let metadata21 =
-            Metadata21::from_cargo_toml(&cargo_toml, &"test-crates/pyo3-pure").unwrap();
-        assert_eq!(get_min_python_minor(&metadata21), None);
+        let metadata22 =
+            Metadata22::from_cargo_toml(&cargo_toml, &"test-crates/pyo3-pure").unwrap();
+        assert_eq!(get_min_python_minor(&metadata22), None);
     }
 }

@@ -7,7 +7,7 @@ use crate::module_writer::write_python_part;
 use crate::module_writer::WheelWriter;
 use crate::module_writer::{write_bin, write_bindings_module, write_cffi_module};
 use crate::source_distribution::source_distribution;
-use crate::Metadata21;
+use crate::Metadata22;
 use crate::PyProjectToml;
 use crate::PythonInterpreter;
 use crate::Target;
@@ -125,12 +125,12 @@ pub struct BuildContext {
     /// Whether this project is pure rust or rust mixed with python
     pub project_layout: ProjectLayout,
     /// Python Package Metadata 2.1
-    pub metadata21: Metadata21,
+    pub metadata22: Metadata22,
     /// The name of the crate
     pub crate_name: String,
     /// The name of the module can be distinct from the package name, mostly
     /// because package names normally contain minuses while module names
-    /// have underscores. The package name is part of metadata21
+    /// have underscores. The package name is part of metadata22
     pub module_name: String,
     /// The path to the Cargo.toml. Required for the cargo invocations
     pub manifest_path: PathBuf,
@@ -191,7 +191,7 @@ impl BuildContext {
             Ok(pyproject) => {
                 let sdist_path = source_distribution(
                     &self.out,
-                    &self.metadata21,
+                    &self.metadata22,
                     &self.manifest_path,
                     &self.cargo_metadata,
                     pyproject.sdist_include(),
@@ -237,7 +237,7 @@ impl BuildContext {
         let platform = self.target.get_platform_tag(platform_tag, self.universal2);
         let tag = format!("cp{}{}-abi3-{}", major, min_minor, platform);
 
-        let mut writer = WheelWriter::new(&tag, &self.out, &self.metadata21, &[tag.clone()])?;
+        let mut writer = WheelWriter::new(&tag, &self.out, &self.metadata22, &[tag.clone()])?;
 
         write_bindings_module(
             &mut writer,
@@ -292,7 +292,7 @@ impl BuildContext {
     ) -> Result<BuiltWheelMetadata> {
         let tag = python_interpreter.get_tag(platform_tag, self.universal2);
 
-        let mut writer = WheelWriter::new(&tag, &self.out, &self.metadata21, &[tag.clone()])?;
+        let mut writer = WheelWriter::new(&tag, &self.out, &self.metadata22, &[tag.clone()])?;
 
         write_bindings_module(
             &mut writer,
@@ -382,7 +382,7 @@ impl BuildContext {
             .target
             .get_universal_tags(platform_tag, self.universal2);
 
-        let mut builder = WheelWriter::new(&tag, &self.out, &self.metadata21, &tags)?;
+        let mut builder = WheelWriter::new(&tag, &self.out, &self.metadata22, &tags)?;
 
         write_cffi_module(
             &mut builder,
@@ -420,11 +420,11 @@ impl BuildContext {
             .target
             .get_universal_tags(platform_tag, self.universal2);
 
-        if !self.metadata21.scripts.is_empty() {
+        if !self.metadata22.scripts.is_empty() {
             bail!("Defining entrypoints and working with a binary doesn't mix well");
         }
 
-        let mut builder = WheelWriter::new(&tag, &self.out, &self.metadata21, &tags)?;
+        let mut builder = WheelWriter::new(&tag, &self.out, &self.metadata22, &tags)?;
 
         match self.project_layout {
             ProjectLayout::Mixed {
@@ -443,7 +443,7 @@ impl BuildContext {
         let bin_name = artifact
             .file_name()
             .expect("Couldn't get the filename from the binary produced by cargo");
-        write_bin(&mut builder, &artifact, &self.metadata21, bin_name)?;
+        write_bin(&mut builder, &artifact, &self.metadata22, bin_name)?;
 
         let wheel_path = builder.finish()?;
         Ok((wheel_path, "py3".to_string()))

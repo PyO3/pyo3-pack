@@ -32,7 +32,7 @@ pub use crate::build_options::BuildOptions;
 pub use crate::cargo_toml::CargoToml;
 pub use crate::compile::compile;
 pub use crate::develop::develop;
-pub use crate::metadata::{Metadata21, WheelMetadata};
+pub use crate::metadata::{Metadata22, WheelMetadata};
 pub use crate::module_writer::{
     write_dist_info, ModuleWriter, PathWriter, SDistWriter, WheelWriter,
 };
