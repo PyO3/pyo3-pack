@@ -1,0 +1,14 @@
+[build-system]
+requires = ["maturin>=0.11,<0.12"]
+build-backend = "maturin"
+
+[project]
+name = "pyo3-mixed-py-subdir"
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Rust"
+]
+requires-python = ">=3.6"
+
+[project.scripts]
+get_42 = "pyo3_mixed_py_subdir:get_42"
