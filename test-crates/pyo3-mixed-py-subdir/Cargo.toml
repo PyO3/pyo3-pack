@@ -1,0 +1,17 @@
+[package]
+authors = ["konstin <konstin@mailbox.org>"]
+name = "pyo3-mixed-py-subdir"
+version = "2.1.3"
+description = "Implements a dummy function combining rust and python"
+readme = "Readme.md"
+edition = "2018"
+
+[dependencies]
+pyo3 = { version = "0.14.0", features = ["extension-module"] }
+
+[lib]
+name = "pyo3_mixed_py_subdir"
+crate-type = ["cdylib"]
+
+[package.metadata.maturin]
+python-source = "python"
